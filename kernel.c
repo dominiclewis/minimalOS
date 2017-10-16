@@ -94,21 +94,28 @@ void terminal_putchar(char c) {
   }
 }
 
+void terminal_scroll(){
+  for (size_t i = 0; i < VGA_HEIGHT; i++){
+    for (size_t j = 0; j < VGA_WIDTH; j++){
+      terminal_buffer[i * VGA_WIDTH + j] = terminal_buffer[(i + 1) * VGA_WIDTH + j];
+    }
+  }
+}
 
 void terminal_writestring(const char* data) {
   size_t datalen = strlen(data);
-  for (size_t i = 0; i < datalen; i++)
-	{
-    if (data[i] == '\n') //Newline Escape
-			{
-
+	if(terminal_row > 25){ //store old entries in terminal_buffer
+		terminal_scroll();
+	}
+  for (size_t i = 0; i < datalen; i++) {
+    if (data[i] == '\n') { //newline character check
 				terminal_row += 1;
 				terminal_column = 0;
 			}
-			else{
+			else {
 		terminal_putchar(data[i]);
 		}
-	}
+  }
 }
 
 #if defined(__cplusplus)
@@ -118,21 +125,19 @@ void kernel_main() {
   /* Initialize terminal interface */
   terminal_initialize();
 
-  /* Since there is no support for newlines in terminal_putchar
-   * yet, '\n' will produce some VGA specific character instead.
-   * This is normal.
-   */
-	 terminal_setcolor(COLOR_BLUE);
-   terminal_writestring("Hello World\n");
-
-	 for (int x = 0; x<= 5; x++)
-	 {
-		 for(int i = 0; i <= 15; i++ )
-		 {
-			 terminal_setcolor(i);
-			 terminal_writestring("Hello World\n");
+     terminal_setcolor(1); //Red
+     terminal_writestring("Hello, kernel World!\n");
+     for(int count = 0; count < 6; count++){
+       terminal_setcolor(15); //White
+			 terminal_writestring("Hello, kernel World!\n");
+     }
+		 for(int count = 0; count < 18; count++){
+			 terminal_setcolor(1); //Blue
+			 terminal_writestring("Hello, kernel World!\n");
 		 }
-		 
+		 for(int count = 0; count < 5; count++){
+			 terminal_setcolor(2); //White
+			 terminal_writestring("Hello, kernel World!\n");
 		 }
 
 }
